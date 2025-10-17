@@ -30,3 +30,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Sensíveis ###
+mongo.properties
