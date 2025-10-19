@@ -32,6 +32,7 @@ public class UserService {
         }
     }
 
+    @Transactional
     public void delete(String id) {
         User user = repository.findById(id).orElse(null);
         repository.delete(user);
