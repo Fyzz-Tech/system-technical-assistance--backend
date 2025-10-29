@@ -3,6 +3,7 @@ package com.technical_assistance.project.services;
 import com.technical_assistance.project.dtos.client.ClientRequestDTO;
 import com.technical_assistance.project.dtos.client.ClientResponseDTO;
 import com.technical_assistance.project.entities.Client;
+import com.technical_assistance.project.exceptions.ResourceNotFoundException;
 import com.technical_assistance.project.mapper.ClientMapper;
 import com.technical_assistance.project.repositories.ClientRepository;
 import lombok.RequiredArgsConstructor;
@@ -31,17 +32,17 @@ public class ClientService {
     @Transactional
     public Client update(String id, ClientRequestDTO dto){
         try {
-            Client current = repository.findById(id).orElse(null);
+            Client current = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Cliente com ID: " + id + " não existe."));
             mapper.updateClientFromDTO(dto, current);;
             return repository.save(current);
-        }catch(Exception e) {
-            throw e;
+        }catch(ResourceNotFoundException e) {
+            throw new ResourceNotFoundException(id);
         }
     }
 
     @Transactional
     public void delete(String id){
-        Client client = repository.findById(id).orElse(null);
+        Client client = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Cliente com ID: " + id + " não existe."));
         repository.delete(client);
     }
 }

@@ -2,6 +2,7 @@ package com.technical_assistance.project.services;
 
 import com.technical_assistance.project.dtos.user.UserRequestDTO;
 import com.technical_assistance.project.entities.User;
+import com.technical_assistance.project.exceptions.ResourceNotFoundException;
 import com.technical_assistance.project.mapper.UserMapper;
 import com.technical_assistance.project.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,17 +25,17 @@ public class UserService {
     @Transactional
     public User update(String id, UserRequestDTO dto) {
         try {
-            User current = repository.findById(id).orElse(null);
+            User current = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Usuário com ID: " + id + " não existe."));
             mapper.updateUserFromDTO(dto, current);
             return repository.save(current);
-        } catch(Exception e) {
-            throw e;
+        } catch(ResourceNotFoundException e) {
+            throw new ResourceNotFoundException(id);
         }
     }
 
     @Transactional
     public void delete(String id) {
-        User user = repository.findById(id).orElse(null);
+        User user = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Usuário com ID: " + id + " não existe."));
         repository.delete(user);
     }
 }

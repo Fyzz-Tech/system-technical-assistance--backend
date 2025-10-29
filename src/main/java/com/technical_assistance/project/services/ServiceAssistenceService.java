@@ -27,7 +27,7 @@ public class ServiceAssistenceService {
     }
 
     public ServiceAssistence findById(String serviceId){
-        return repository.findById(serviceId).orElseThrow(()->new ResourceNotFoundException("Serviço com ID: " + serviceId + " não existe."));
+        return repository.findById(serviceId).orElseThrow(() -> new ResourceNotFoundException("Serviço com ID: " + serviceId + " não existe."));
     }
 
     @Transactional
