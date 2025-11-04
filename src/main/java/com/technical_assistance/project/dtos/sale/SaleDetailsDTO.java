@@ -1,6 +1,5 @@
 package com.technical_assistance.project.dtos.sale;
 
-import com.technical_assistance.project.entities.Client;
 import com.technical_assistance.project.entities.ProductItem;
 import com.technical_assistance.project.entities.Sale;
 

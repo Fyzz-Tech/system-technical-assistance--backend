@@ -8,6 +8,6 @@ public record ProductRequestDTO(
         @NotNull String name,
         @NotNull Status status,
         @NotNull Category category,
-        @NotNull Double unitPrice,
-        @NotNull Integer quantityStock) {
+        @NotNull Double priceForSale,
+        @NotNull Double priceAtCost) {
 }

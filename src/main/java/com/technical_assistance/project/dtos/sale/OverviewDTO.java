@@ -10,11 +10,11 @@ import java.util.List;
 public record OverviewDTO(String client, List<ProductItem> items, LocalDate createdAt, Double totalValue, StatusSale status) {
     public OverviewDTO(Sale sale){
         this(
-                sale.getClient().getName(),
-                sale.getItems(),
-                sale.getDateHour().toLocalDate(),
-                sale.getTotalValue(),
-                sale.getStatus()
+                sale.getClient() != null ? sale.getClient().getName() : "Cliente não informado",
+                sale.getItems() != null ? sale.getItems() : List.of(),
+                sale.getDateHour() != null ? sale.getDateHour().toLocalDate() : LocalDate.now(),
+                sale.getTotalValue() != null ? sale.getTotalValue() : 0.0,
+                sale.getStatus() != null ? sale.getStatus() : StatusSale.CANCELADO
         );
     }
 }
