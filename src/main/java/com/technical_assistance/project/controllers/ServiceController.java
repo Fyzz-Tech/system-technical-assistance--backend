@@ -1,8 +1,10 @@
 package com.technical_assistance.project.controllers;
 
 import com.technical_assistance.project.dtos.service.ServiceRequestDTO;
+import com.technical_assistance.project.dtos.service.ServiceResponseCatalogDTO;
 import com.technical_assistance.project.dtos.service.ServiceResponseDTO;
 import com.technical_assistance.project.entities.ServiceAssistence;
+import com.technical_assistance.project.enuns.CategoryService;
 import com.technical_assistance.project.mapper.ServiceMapper;
 import com.technical_assistance.project.services.ServiceAssistenceService;
 import jakarta.validation.Valid;
@@ -13,6 +15,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -58,5 +61,10 @@ public class ServiceController {
     public ResponseEntity<Void> delete(@PathVariable String serviceId){
         service.delete(serviceId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/catalog")
+    public Map<CategoryService, List<ServiceResponseCatalogDTO>> getCatalog() {
+        return service.getCatalogByCategory();
     }
 }
