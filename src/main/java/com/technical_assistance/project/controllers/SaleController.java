@@ -47,13 +47,6 @@ public class SaleController {
         return ResponseEntity.created(location).body(response);
     }
 
-    @PutMapping("/{saleId}")
-    public ResponseEntity<SaleResponseDTO> update(@PathVariable String saleId, @RequestBody @Valid SaleRequestDTO dto) {
-        Sale current = service.update(saleId, dto);
-        SaleResponseDTO response = mapper.toResponseDTO(current);
-        return ResponseEntity.ok(response);
-    }
-
     @DeleteMapping("/{saleId}")
     public ResponseEntity<Void> delete(@PathVariable String saleId) {
         service.delete(saleId);

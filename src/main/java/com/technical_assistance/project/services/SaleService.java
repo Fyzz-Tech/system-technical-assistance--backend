@@ -3,10 +3,12 @@ package com.technical_assistance.project.services;
 import com.technical_assistance.project.dtos.sale.OverviewDTO;
 import com.technical_assistance.project.dtos.sale.SaleDetailsDTO;
 import com.technical_assistance.project.dtos.sale.SaleRequestDTO;
+import com.technical_assistance.project.dtos.stock.StockExitMovementDTO;
 import com.technical_assistance.project.entities.Client;
 import com.technical_assistance.project.entities.Product;
 import com.technical_assistance.project.entities.ProductItem;
 import com.technical_assistance.project.entities.Sale;
+import com.technical_assistance.project.enuns.OriginMovement;
 import com.technical_assistance.project.enuns.StatusSale;
 import com.technical_assistance.project.exceptions.ResourceNotFoundException;
 import com.technical_assistance.project.mapper.SaleMapper;
@@ -29,6 +31,7 @@ public class SaleService {
     private final SaleRepository repository;
     private final ClientRepository clientRepository;
     private final ProductRepository productRepository;
+    private final StockService stockService;
     private final SaleMapper mapper;
 
     public List<OverviewDTO> overview(){
@@ -42,9 +45,9 @@ public class SaleService {
     }
 
     @Transactional
-    public Sale create(SaleRequestDTO dto){
+    public Sale create(SaleRequestDTO dto) {
         Client client = clientRepository.findById(dto.clientId())
-                .orElseThrow(() -> new ResourceNotFoundException("Cliente com ID: " + dto.clientId() + " não existe;"));
+                .orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado"));
 
         Sale sale = mapper.toEntity(dto);
         sale.setClient(client);
@@ -52,7 +55,7 @@ public class SaleService {
 
         List<ProductItem> items = dto.items() == null ? new ArrayList<>() :
                 dto.items().stream()
-                        .map(i -> new ProductItem(i.getProductId(), i.getQuantity()))
+                        .map(i -> new ProductItem(i.productId(), i.quantity()))
                         .collect(Collectors.toList());
 
         sale.setItems(items);
@@ -62,39 +65,21 @@ public class SaleService {
         double total = sale.getItems().stream()
                 .mapToDouble(ProductItem::getTotalValueItemProduct)
                 .sum();
-
         sale.setTotalValue(total);
 
-        return repository.save(sale);
-    }
+        Sale savedSale = repository.save(sale);
 
-    @Transactional
-    public Sale update(String id, SaleRequestDTO dto){
-        Sale current = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Sale com ID: " + id + " não existe;"));
-        mapper.updateSaleFromDTO(dto, current);
-
-        Client client = clientRepository.findById(dto.clientId())
-                .orElseThrow(() -> new ResourceNotFoundException("Cliente com ID: " + dto.clientId() + " não existe;"));
-        current.setClient(client);
-
-
-        List<ProductItem> items = dto.items() == null ? new ArrayList<>() :
-                dto.items().stream()
-                        .map(i -> new ProductItem(i.getProductId(), i.getQuantity()))
-                        .collect(Collectors.toList());
-
-        current.setItems(items);
-
-        current.getItems().forEach(this::prepareCreateSale);
-
-        double total = current.getItems().stream()
-                .mapToDouble(ProductItem::getTotalValueItemProduct)
-                .sum();
-
-        current.setTotalValue(total);
-
-        return repository.save(current);
+        if (dto.status() == StatusSale.PAGO) {
+            sale.getItems().forEach(item -> {
+                StockExitMovementDTO exitDto = new StockExitMovementDTO(
+                        item.getProductId(),
+                        item.getQuantity(),
+                        OriginMovement.VENDA
+                );
+                stockService.registerExit(exitDto);
+            });
+        }
+        return savedSale;
     }
 
 
@@ -109,7 +94,7 @@ public class SaleService {
                 .orElseThrow(() -> new ResourceNotFoundException("O produto com ID: " + item.getProductId() + " não existe."));
 
         item.setProductName(product.getName());
-        item.setProductPrice(product.getUnitPrice());
+        item.setProductPrice(product.getPriceForSale());
     }
 
     public Double invoicing(){
