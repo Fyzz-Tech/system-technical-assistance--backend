@@ -19,13 +19,4 @@ public class Product {
     private Category category;
     private Double priceForSale;
     private Double priceAtCost;
-
-    public Product(String name, Status status, Category category, Double priceForSale, Double priceAtCost) {
-        this.name = name;
-        this.status = status;
-        this.category = category;
-        this.priceForSale = priceForSale;
-        this.priceAtCost = priceAtCost;
-    }
-
 }
