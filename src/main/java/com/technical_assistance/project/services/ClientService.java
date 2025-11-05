@@ -3,6 +3,7 @@ package com.technical_assistance.project.services;
 import com.technical_assistance.project.dtos.client.ClientRequestDTO;
 import com.technical_assistance.project.dtos.client.ClientResponseDTO;
 import com.technical_assistance.project.entities.Client;
+import com.technical_assistance.project.exceptions.ExistingResourceException;
 import com.technical_assistance.project.exceptions.ResourceNotFoundException;
 import com.technical_assistance.project.repositories.ClientRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,19 +24,18 @@ public class ClientService {
 
     @Transactional
     public Client create(ClientRequestDTO dto){
+        if(repository.findByEmail(dto.getEmail()).isPresent()){
+            throw new ExistingResourceException("O email já se encontra cadastrado. ");
+        }
         Client newClient = dto.toEntity();
         return repository.save(newClient);
     }
 
     @Transactional
     public Client update(String id, ClientRequestDTO dto){
-        try {
-            Client current = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Cliente com ID: " + id + " não existe."));
-            dto.updateEntity(current);
-            return repository.save(current);
-        }catch(ResourceNotFoundException e) {
-            throw new ResourceNotFoundException(id);
-        }
+        Client current = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Cliente com ID: " + id + " não existe."));
+        dto.updateEntity(current);
+        return repository.save(current);
     }
 
     @Transactional

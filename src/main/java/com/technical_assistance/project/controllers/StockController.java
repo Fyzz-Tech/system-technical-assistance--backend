@@ -6,6 +6,7 @@ import com.technical_assistance.project.dtos.product.ProductStockDTO;
 import com.technical_assistance.project.dtos.stock.StockExitMovementDTO;
 import com.technical_assistance.project.entities.Product;
 import com.technical_assistance.project.services.StockService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,13 +22,13 @@ public class StockController {
     private final StockService service;
 
     @PostMapping("/product")
-    public ResponseEntity<ProductStockDTO> createProduct(@RequestBody ProductRequestDTO dto, @RequestParam Integer quantity) {
+    public ResponseEntity<ProductStockDTO> createProduct(@RequestBody @Valid ProductRequestDTO dto, @RequestParam Integer quantity) {
         ProductStockDTO response = service.createProductWithStock(dto, quantity);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping("/product/{id}")
-    public ResponseEntity<ProductStockDTO> updateProduct(@RequestBody ProductRequestUpdateDTO dto, @PathVariable String id) {
+    public ResponseEntity<ProductStockDTO> updateProduct(@RequestBody @Valid ProductRequestUpdateDTO dto, @PathVariable String id) {
         Product current = service.updateProduct(id, dto);
         ProductStockDTO response = new ProductStockDTO(current);
         return ResponseEntity.ok(response);

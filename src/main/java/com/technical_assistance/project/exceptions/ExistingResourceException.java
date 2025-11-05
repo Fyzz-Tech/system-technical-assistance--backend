@@ -2,12 +2,12 @@ package com.technical_assistance.project.exceptions;
 
 import java.io.Serial;
 
-public class ResourceNotFoundException extends RuntimeException{
+public class ExistingResourceException extends RuntimeException{
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    public ResourceNotFoundException(String message){
+    public ExistingResourceException(String message){
         super(message);
     }
 }

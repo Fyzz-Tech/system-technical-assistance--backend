@@ -2,6 +2,7 @@ package com.technical_assistance.project.services;
 
 import com.technical_assistance.project.dtos.user.UserRequestDTO;
 import com.technical_assistance.project.entities.User;
+import com.technical_assistance.project.exceptions.ExistingResourceException;
 import com.technical_assistance.project.exceptions.ResourceNotFoundException;
 import com.technical_assistance.project.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +17,10 @@ public class UserService {
 
     @Transactional
     public User create(UserRequestDTO dto) {
-        User user =  dto.toEntity();
+        if (repository.findByEmail(dto.getEmail()).isPresent()) {
+            throw new ExistingResourceException("O email já se encontra cadastrado.");
+        }
+        User user = dto.toEntity();
         return repository.save(user);
     }
 

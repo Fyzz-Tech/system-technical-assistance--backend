@@ -74,7 +74,7 @@ public class StockService {
     @Transactional
     public void deleteProduct(String productId) {
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Produto com ID: " + productId + " não existe."));
 
         stockRepository.deleteByProductId(productId);
         stockMovementRepository.deleteByProductId(productId);
@@ -84,13 +84,13 @@ public class StockService {
     @Transactional
     public void registerExit(StockExitMovementDTO dto) {
         Product product = productRepository.findById(dto.getProductId())
-                .orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Produto com ID: " + dto.getProductId() + " não existe."));
 
         Stock stock = stockRepository.findFirstByProductId(dto.getProductId())
                 .orElseThrow(() -> new RuntimeException("Estoque não encontrado"));
 
         if (stock.getQuantityCurrent() < dto.getQuantity()) {
-            throw new RuntimeException("Estoque insuficiente");
+            throw new RuntimeException("Estoque com quantidade insuficiente.");
         }
 
         StockMovement movement = new StockMovement();

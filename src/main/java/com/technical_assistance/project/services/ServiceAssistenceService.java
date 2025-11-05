@@ -45,15 +45,11 @@ public class ServiceAssistenceService {
 
     @Transactional
     public ServiceAssistence update(ServiceRequestDTO dto, String serviceId){
-        try {
-            Client client = clientRepository.findById(dto.getClientId()).orElseThrow(() -> new ResourceNotFoundException("Client com ID: " + dto.getClientId() + " não existe."));
-            ServiceAssistence current = repository.findById(serviceId).orElseThrow(() -> new ResourceNotFoundException("Serviço com ID: " + serviceId + " não existe."));
-            current.setClient(client);
-            dto.updateEntity(current);
-            return repository.save(current);
-        }catch (ResourceNotFoundException e){
-            throw new ResourceNotFoundException(serviceId);
-        }
+        Client client = clientRepository.findById(dto.getClientId()).orElseThrow(() -> new ResourceNotFoundException("Client com ID: " + dto.getClientId() + " não existe."));
+        ServiceAssistence current = repository.findById(serviceId).orElseThrow(() -> new ResourceNotFoundException("Serviço com ID: " + serviceId + " não existe."));
+        current.setClient(client);
+        dto.updateEntity(current);
+        return repository.save(current);
     }
 
     @Transactional
