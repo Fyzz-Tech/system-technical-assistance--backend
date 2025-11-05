@@ -4,25 +4,36 @@ import com.technical_assistance.project.enuns.Category;
 import com.technical_assistance.project.enuns.Status;
 import com.technical_assistance.project.entities.Product;
 import com.technical_assistance.project.entities.Stock;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-public record ProductStockDTO(
-        String productId,
-        String productName,
-        Category category,
-        Integer quantityCurrent,
-        Double priceForSale,
-        Double priceAtCost,
-        Status status
-) {
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class ProductStockDTO {
+
+    private String productId;
+    private String productName;
+    private Category category;
+    private Integer quantityCurrent;
+    private Double priceForSale;
+    private Double priceAtCost;
+    private Status status;
+
     public ProductStockDTO(Product product, Stock stock) {
-        this(
-                product.getId(),
-                product.getName(),
-                product.getCategory(),
-                stock != null ? stock.getQuantityCurrent() : 0,
-                product.getPriceForSale(),
-                product.getPriceAtCost(),
-                product.getStatus()
-        );
+        this.productId = product.getId();
+        this.productName = product.getName();
+        this.category = product.getCategory();
+        this.quantityCurrent = stock != null ? stock.getQuantityCurrent() : 0;
+        this.priceForSale = product.getPriceForSale();
+        this.priceAtCost = product.getPriceAtCost();
+        this.status = product.getStatus();
+    }
+
+    public ProductStockDTO(Product product) {
+        this(product, null);
     }
 }

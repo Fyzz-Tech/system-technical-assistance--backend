@@ -7,7 +7,6 @@ import com.technical_assistance.project.entities.Client;
 import com.technical_assistance.project.entities.ServiceAssistence;
 import com.technical_assistance.project.enuns.CategoryService;
 import com.technical_assistance.project.exceptions.ResourceNotFoundException;
-import com.technical_assistance.project.mapper.ServiceMapper;
 import com.technical_assistance.project.repositories.ClientRepository;
 import com.technical_assistance.project.repositories.ServiceRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +24,6 @@ public class ServiceAssistenceService {
 
     private final ServiceRepository repository;
     private final ClientRepository clientRepository;
-    private final ServiceMapper mapper;
 
     public List<ServiceResponseDTO> findAll(){
         return repository.findAll().stream().map(ServiceResponseDTO::new).toList();
@@ -37,21 +35,21 @@ public class ServiceAssistenceService {
 
     @Transactional
     public ServiceAssistence create(ServiceRequestDTO dto){
-        Client client = clientRepository.findById(dto.clientId()).orElseThrow(() -> new ResourceNotFoundException("Client com ID: " + dto.clientId() + " não existe."));
-        ServiceAssistence newService = mapper.toEntity(dto);
+        Client client = clientRepository.findById(dto.getClientId()).orElseThrow(() -> new ResourceNotFoundException("Client com ID: " + dto.getClientId() + " não existe."));
+        ServiceAssistence newService = dto.toEntity();
         newService.setDate(LocalDate.now());
         newService.setClient(client);
-        newService.setCategory(dto.category());
+        newService.setCategory(dto.getCategory());
         return repository.save(newService);
     }
 
     @Transactional
     public ServiceAssistence update(ServiceRequestDTO dto, String serviceId){
         try {
-            Client client = clientRepository.findById(dto.clientId()).orElseThrow(() -> new ResourceNotFoundException("Client com ID: " + dto.clientId() + " não existe."));
+            Client client = clientRepository.findById(dto.getClientId()).orElseThrow(() -> new ResourceNotFoundException("Client com ID: " + dto.getClientId() + " não existe."));
             ServiceAssistence current = repository.findById(serviceId).orElseThrow(() -> new ResourceNotFoundException("Serviço com ID: " + serviceId + " não existe."));
             current.setClient(client);
-            mapper.updateServiceFromDTO(dto, current);
+            dto.updateEntity(current);
             return repository.save(current);
         }catch (ResourceNotFoundException e){
             throw new ResourceNotFoundException(serviceId);

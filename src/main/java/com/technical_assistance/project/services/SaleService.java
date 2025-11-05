@@ -11,7 +11,6 @@ import com.technical_assistance.project.entities.Sale;
 import com.technical_assistance.project.enuns.OriginMovement;
 import com.technical_assistance.project.enuns.StatusSale;
 import com.technical_assistance.project.exceptions.ResourceNotFoundException;
-import com.technical_assistance.project.mapper.SaleMapper;
 import com.technical_assistance.project.repositories.ClientRepository;
 import com.technical_assistance.project.repositories.ProductRepository;
 import com.technical_assistance.project.repositories.SaleRepository;
@@ -19,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,9 +31,9 @@ public class SaleService {
     private final ClientRepository clientRepository;
     private final ProductRepository productRepository;
     private final StockService stockService;
-    private final SaleMapper mapper;
 
     public List<OverviewDTO> overview(){
+        System.out.println(repository.findAll().size());
         return repository.findAll().stream().map(OverviewDTO::new).toList();
     }
 
@@ -46,16 +45,17 @@ public class SaleService {
 
     @Transactional
     public Sale create(SaleRequestDTO dto) {
-        Client client = clientRepository.findById(dto.clientId())
+        Client client = clientRepository.findById(dto.getClientId())
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado"));
 
-        Sale sale = mapper.toEntity(dto);
+        Sale sale = dto.toEntity();
         sale.setClient(client);
-        sale.setDateHour(LocalDateTime.now());
+        sale.setDateHour(LocalDate.now());
+        sale.setStatus(dto.getStatus());
 
-        List<ProductItem> items = dto.items() == null ? new ArrayList<>() :
-                dto.items().stream()
-                        .map(i -> new ProductItem(i.productId(), i.quantity()))
+        List<ProductItem> items = dto.getItems() == null ? new ArrayList<>() :
+                dto.getItems().stream()
+                        .map(i -> new ProductItem(i.getProductId(), i.getQuantity()))
                         .collect(Collectors.toList());
 
         sale.setItems(items);
@@ -69,7 +69,7 @@ public class SaleService {
 
         Sale savedSale = repository.save(sale);
 
-        if (dto.status() == StatusSale.PAGO) {
+        if (dto.getStatus() == StatusSale.PAGO) {
             sale.getItems().forEach(item -> {
                 StockExitMovementDTO exitDto = new StockExitMovementDTO(
                         item.getProductId(),
@@ -81,7 +81,6 @@ public class SaleService {
         }
         return savedSale;
     }
-
 
     @Transactional
     public void delete(String id){

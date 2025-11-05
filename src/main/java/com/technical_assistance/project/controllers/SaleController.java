@@ -5,7 +5,6 @@ import com.technical_assistance.project.dtos.sale.SaleDetailsDTO;
 import com.technical_assistance.project.dtos.sale.SaleRequestDTO;
 import com.technical_assistance.project.dtos.sale.SaleResponseDTO;
 import com.technical_assistance.project.entities.Sale;
-import com.technical_assistance.project.mapper.SaleMapper;
 import com.technical_assistance.project.services.SaleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +21,6 @@ import java.util.List;
 public class SaleController {
 
     private final SaleService service;
-    private final SaleMapper mapper;
 
     @GetMapping
     public ResponseEntity<List<OverviewDTO>> overview() {
@@ -43,7 +41,7 @@ public class SaleController {
                 .fromCurrentRequest().path("/{id}")
                 .buildAndExpand(newSale.getId())
                 .toUri();
-        SaleResponseDTO response = mapper.toResponseDTO(newSale);
+        SaleResponseDTO response = new SaleResponseDTO(newSale);
         return ResponseEntity.created(location).body(response);
     }
 

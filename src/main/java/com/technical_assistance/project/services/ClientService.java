@@ -4,7 +4,6 @@ import com.technical_assistance.project.dtos.client.ClientRequestDTO;
 import com.technical_assistance.project.dtos.client.ClientResponseDTO;
 import com.technical_assistance.project.entities.Client;
 import com.technical_assistance.project.exceptions.ResourceNotFoundException;
-import com.technical_assistance.project.mapper.ClientMapper;
 import com.technical_assistance.project.repositories.ClientRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,7 +16,6 @@ import java.util.List;
 public class ClientService {
 
     private final ClientRepository repository;
-    private final ClientMapper mapper;
 
     public List<ClientResponseDTO> findAll(){
         return repository.findAll().stream().map(ClientResponseDTO::new).toList();
@@ -25,7 +23,7 @@ public class ClientService {
 
     @Transactional
     public Client create(ClientRequestDTO dto){
-        Client newClient = mapper.toEntity(dto);
+        Client newClient = dto.toEntity();
         return repository.save(newClient);
     }
 
@@ -33,7 +31,7 @@ public class ClientService {
     public Client update(String id, ClientRequestDTO dto){
         try {
             Client current = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Cliente com ID: " + id + " não existe."));
-            mapper.updateClientFromDTO(dto, current);;
+            dto.updateEntity(current);
             return repository.save(current);
         }catch(ResourceNotFoundException e) {
             throw new ResourceNotFoundException(id);

@@ -9,7 +9,7 @@ import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @Document(collection = "sales")
@@ -21,7 +21,7 @@ public class Sale {
 
     @Id
     private String id;
-    private LocalDateTime dateHour;
+    private LocalDate dateHour;
     private Double totalValue;
     private PaymentMethod paymentMethod;
     private StatusSale status;

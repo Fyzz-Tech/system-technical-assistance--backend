@@ -9,7 +9,6 @@ import com.technical_assistance.project.entities.Stock;
 import com.technical_assistance.project.entities.StockMovement;
 import com.technical_assistance.project.enuns.MovementType;
 import com.technical_assistance.project.exceptions.ResourceNotFoundException;
-import com.technical_assistance.project.mapper.ProductMapper;
 import com.technical_assistance.project.repositories.ProductRepository;
 import com.technical_assistance.project.repositories.StockMovementRepository;
 import com.technical_assistance.project.repositories.StockRepository;
@@ -27,15 +26,14 @@ public class StockService {
     private final StockRepository stockRepository;
     private final ProductRepository productRepository;
     private final StockMovementRepository stockMovementRepository;
-    private final ProductMapper productMapper;
 
     @Transactional
-    public Product createProductWithStock(ProductRequestDTO dto, Integer quantity) {
+    public ProductStockDTO createProductWithStock(ProductRequestDTO dto, Integer quantity) {
         if (quantity == null || quantity < 0) {
-            throw new IllegalArgumentException("A quantidade inicial do produto é obrigatória e deve ser maior ou igual a 0.");
+            throw new IllegalArgumentException("A quantidade inicial do produto deve ser >= 0.");
         }
 
-        Product product = productMapper.toEntity(dto);
+        Product product = dto.toEntity();
         Product savedProduct = productRepository.save(product);
 
         Stock stock = new Stock();
@@ -51,21 +49,23 @@ public class StockService {
             movement.setDateHour(LocalDateTime.now());
             stockMovementRepository.save(movement);
         }
-        return savedProduct;
+
+        return new ProductStockDTO(savedProduct, stock);
     }
+
 
     @Transactional
     public Product updateProduct(String id, ProductRequestUpdateDTO dto) {
         Product current = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Produto com ID: " + id + " não existe."));
 
-        productMapper.updateProductFromDTO(dto, current);
+        dto.updateEntity(current);
         Product updatedProduct = productRepository.save(current);
 
-        if (dto.quantity() != null) {
+        if (dto.getQuantity() != null) {
             Stock stock = stockRepository.findFirstByProductId(id)
                     .orElseThrow(() -> new RuntimeException("Estoque não encontrado para este produto"));
-            stock.setQuantityCurrent(dto.quantity());
+            stock.setQuantityCurrent(dto.getQuantity());
             stockRepository.save(stock);
         }
         return updatedProduct;
@@ -83,25 +83,25 @@ public class StockService {
 
     @Transactional
     public void registerExit(StockExitMovementDTO dto) {
-        Product product = productRepository.findById(dto.productId())
+        Product product = productRepository.findById(dto.getProductId())
                 .orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado"));
 
-        Stock stock = stockRepository.findFirstByProductId(dto.productId())
+        Stock stock = stockRepository.findFirstByProductId(dto.getProductId())
                 .orElseThrow(() -> new RuntimeException("Estoque não encontrado"));
 
-        if (stock.getQuantityCurrent() < dto.quantity()) {
+        if (stock.getQuantityCurrent() < dto.getQuantity()) {
             throw new RuntimeException("Estoque insuficiente");
         }
 
         StockMovement movement = new StockMovement();
         movement.setProduct(product);
-        movement.setQuantity(dto.quantity());
+        movement.setQuantity(dto.getQuantity());
         movement.setType(MovementType.SAIDA);
-        movement.setOrigin(dto.origin());
+        movement.setOrigin(dto.getOrigin());
         movement.setDateHour(LocalDateTime.now());
         stockMovementRepository.save(movement);
 
-        stock.setQuantityCurrent(stock.getQuantityCurrent() - dto.quantity());
+        stock.setQuantityCurrent(stock.getQuantityCurrent() - dto.getQuantity());
         stockRepository.save(stock);
     }
 

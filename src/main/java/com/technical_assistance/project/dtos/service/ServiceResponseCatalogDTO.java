@@ -1,21 +1,28 @@
 package com.technical_assistance.project.dtos.service;
 
 import com.technical_assistance.project.entities.ServiceAssistence;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
 
-public record ServiceResponseCatalogDTO(
-        String clientId,
-        String name,
-        Double price,
-        LocalDate date) {
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class ServiceResponseCatalogDTO {
+
+    private String clientId;
+    private String name;
+    private Double price;
+    private LocalDate date;
 
     public ServiceResponseCatalogDTO(ServiceAssistence service) {
-        this(
-                service.getClient().getName(),
-                service.getName(),
-                service.getPrice(),
-                service.getDate()
-        );
+        this.clientId = service.getClient().getName();
+        this.name = service.getName();
+        this.price = service.getPrice();
+        this.date = service.getDate();
     }
 }

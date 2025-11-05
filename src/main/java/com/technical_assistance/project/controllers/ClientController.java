@@ -3,7 +3,6 @@ package com.technical_assistance.project.controllers;
 import com.technical_assistance.project.dtos.client.ClientRequestDTO;
 import com.technical_assistance.project.dtos.client.ClientResponseDTO;
 import com.technical_assistance.project.entities.Client;
-import com.technical_assistance.project.mapper.ClientMapper;
 import com.technical_assistance.project.services.ClientService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +19,6 @@ import java.util.List;
 public class ClientController {
 
     private final ClientService service;
-    private final ClientMapper mapper;
 
     @GetMapping
     public ResponseEntity<List<ClientResponseDTO>> findAll(){
@@ -35,14 +33,14 @@ public class ClientController {
                 .fromCurrentRequest().path("/{id}")
                 .buildAndExpand(newClient.getId())
                 .toUri();
-        ClientResponseDTO response = mapper.toResponseDTO(newClient);
+        ClientResponseDTO response = new ClientResponseDTO(newClient);
         return ResponseEntity.created(location).body(response);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ClientResponseDTO> update(@PathVariable String id, @RequestBody @Valid ClientRequestDTO dto){
         Client current = service.update(id, dto);
-        ClientResponseDTO response = mapper.toResponseDTO(current);
+        ClientResponseDTO response = new ClientResponseDTO(current);
         return ResponseEntity.ok(response);
     }
 

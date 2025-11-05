@@ -5,7 +5,6 @@ import com.technical_assistance.project.dtos.product.ProductRequestUpdateDTO;
 import com.technical_assistance.project.dtos.product.ProductStockDTO;
 import com.technical_assistance.project.dtos.stock.StockExitMovementDTO;
 import com.technical_assistance.project.entities.Product;
-import com.technical_assistance.project.mapper.ProductMapper;
 import com.technical_assistance.project.services.StockService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,20 +19,17 @@ import java.util.List;
 public class StockController {
 
     private final StockService service;
-    private final ProductMapper productMapper;
-
 
     @PostMapping("/product")
     public ResponseEntity<ProductStockDTO> createProduct(@RequestBody ProductRequestDTO dto, @RequestParam Integer quantity) {
-        Product product = service.createProductWithStock(dto, quantity);
-        ProductStockDTO response = productMapper.toResponseDTO(product);
+        ProductStockDTO response = service.createProductWithStock(dto, quantity);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping("/product/{id}")
     public ResponseEntity<ProductStockDTO> updateProduct(@RequestBody ProductRequestUpdateDTO dto, @PathVariable String id) {
         Product current = service.updateProduct(id, dto);
-        ProductStockDTO response = productMapper.toResponseDTO(current);
+        ProductStockDTO response = new ProductStockDTO(current);
         return ResponseEntity.ok(response);
     }
 

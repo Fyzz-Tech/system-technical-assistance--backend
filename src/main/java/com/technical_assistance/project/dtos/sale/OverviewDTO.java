@@ -3,18 +3,32 @@ package com.technical_assistance.project.dtos.sale;
 import com.technical_assistance.project.entities.ProductItem;
 import com.technical_assistance.project.entities.Sale;
 import com.technical_assistance.project.enuns.StatusSale;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
-public record OverviewDTO(String client, List<ProductItem> items, LocalDate createdAt, Double totalValue, StatusSale status) {
-    public OverviewDTO(Sale sale){
-        this(
-                sale.getClient() != null ? sale.getClient().getName() : "Cliente não informado",
-                sale.getItems() != null ? sale.getItems() : List.of(),
-                sale.getDateHour() != null ? sale.getDateHour().toLocalDate() : LocalDate.now(),
-                sale.getTotalValue() != null ? sale.getTotalValue() : 0.0,
-                sale.getStatus() != null ? sale.getStatus() : StatusSale.CANCELADO
-        );
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class OverviewDTO {
+
+    private String client;
+    private List<ProductItem> items = new ArrayList<>();
+    private LocalDate createdAt;
+    private Double totalValue;
+    private StatusSale status;
+
+    public OverviewDTO(Sale sale) {
+        this.client = sale.getClient().getName();
+        this.items = sale.getItems() != null ? sale.getItems() : new ArrayList<>();
+        this.createdAt = sale.getDateHour() != null ? sale.getDateHour() : null;
+        this.totalValue = sale.getTotalValue();
+        this.status = sale.getStatus();
     }
 }

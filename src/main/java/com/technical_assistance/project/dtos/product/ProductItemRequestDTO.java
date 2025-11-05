@@ -1,6 +1,18 @@
 package com.technical_assistance.project.dtos.product;
 
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-public record ProductItemRequestDTO(@NotNull String productId, @NotNull Integer quantity) {
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class ProductItemRequestDTO {
+
+    @NotNull private String productId;
+    @NotNull private Integer quantity;
+
 }

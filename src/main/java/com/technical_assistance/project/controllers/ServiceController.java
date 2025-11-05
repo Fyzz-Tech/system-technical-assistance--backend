@@ -5,7 +5,6 @@ import com.technical_assistance.project.dtos.service.ServiceResponseCatalogDTO;
 import com.technical_assistance.project.dtos.service.ServiceResponseDTO;
 import com.technical_assistance.project.entities.ServiceAssistence;
 import com.technical_assistance.project.enuns.CategoryService;
-import com.technical_assistance.project.mapper.ServiceMapper;
 import com.technical_assistance.project.services.ServiceAssistenceService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +22,6 @@ import java.util.Map;
 public class ServiceController {
 
     private final ServiceAssistenceService service;
-    private final ServiceMapper mapper;
 
     @GetMapping
     public ResponseEntity<List<ServiceResponseDTO>> findAll(){
@@ -34,7 +32,7 @@ public class ServiceController {
     @GetMapping("/{serviceId}")
     public ResponseEntity<ServiceResponseDTO> findById(@PathVariable String serviceId){
         ServiceAssistence serviceFind = service.findById(serviceId);
-        ServiceResponseDTO response = mapper.toResponseDTO(serviceFind);
+        ServiceResponseDTO response = new ServiceResponseDTO(serviceFind);
         return ResponseEntity.ok().body(response);
     }
 
@@ -46,14 +44,14 @@ public class ServiceController {
                 .buildAndExpand(newService.getId())
                 .toUri();
         System.out.println(dto);
-        ServiceResponseDTO response = mapper.toResponseDTO(newService);
+        ServiceResponseDTO response = new ServiceResponseDTO(newService);
         return ResponseEntity.created(location).body(response);
     }
 
     @PutMapping("/{serviceId}")
     public ResponseEntity<ServiceResponseDTO> update(@RequestBody @Valid ServiceRequestDTO dto, @PathVariable String serviceId){
         ServiceAssistence current = service.update(dto, serviceId);
-        ServiceResponseDTO response = mapper.toResponseDTO(current);
+        ServiceResponseDTO response = new ServiceResponseDTO(current);
         return ResponseEntity.ok(response);
     }
 
