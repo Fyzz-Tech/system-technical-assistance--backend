@@ -79,4 +79,17 @@ public class ResourceExceptionHandler {
                 request.getRequestURI());
         return ResponseEntity.status(status).body(err);
     }
+
+    @ExceptionHandler(InvalidTokenException.class)
+    public ResponseEntity<StandardError> invalidToken(InvalidTokenException e, HttpServletRequest request){
+        String error = "Invalid token";
+        HttpStatus status = HttpStatus.UNAUTHORIZED;
+        StandardError err = new StandardError(
+                Instant.now(),
+                status.value(),
+                error,
+                e.getMessage(),
+                request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
 }
