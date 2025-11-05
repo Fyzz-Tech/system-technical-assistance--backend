@@ -1,4 +1,4 @@
-package com.technical_assistance.project.security;
+package com.technical_assistance.project.services;
 
 import com.technical_assistance.project.repositories.UserRepository;
 import lombok.AllArgsConstructor;
@@ -15,7 +15,8 @@ public class AuthorizationService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return repository.findByEmailLogin(username);
+        return repository.findByEmail(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado com email: " + username));
     }
 
 }
