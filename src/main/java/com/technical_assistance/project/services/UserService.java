@@ -6,6 +6,7 @@ import com.technical_assistance.project.exceptions.ExistingResourceException;
 import com.technical_assistance.project.exceptions.ResourceNotFoundException;
 import com.technical_assistance.project.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,10 +18,11 @@ public class UserService {
 
     @Transactional
     public User create(UserRequestDTO dto) {
-        if (repository.findByEmail(dto.getEmail()).isPresent()) {
+        if (repository.findByEmail((dto.getEmail())).isPresent()) {
             throw new ExistingResourceException("O email já se encontra cadastrado.");
         }
         User user = dto.toEntity();
+        user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
         return repository.save(user);
     }
 
@@ -29,6 +31,7 @@ public class UserService {
         try {
             User current = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Usuário com ID: " + id + " não existe."));
             dto.updateEntity(current);
+            current.setPassword(new BCryptPasswordEncoder().encode(dto.getPassword()));
             return repository.save(current);
         } catch(ResourceNotFoundException e) {
             throw new ResourceNotFoundException(id);
