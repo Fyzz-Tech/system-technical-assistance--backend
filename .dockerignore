@@ -1,0 +1,10 @@
+# Ignora o diretório de build do Maven
+target/
+
+# Ignora logs
+*.log
+
+# Ignora arquivos do Git e do VSCode
+.git
+.gitignore
+.vscode/

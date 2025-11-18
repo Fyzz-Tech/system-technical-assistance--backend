@@ -1,0 +1,44 @@
+# Versão do Docker Compose
+version: '3.8'
+
+# Define os serviços (containers) que vamos rodar
+services:
+  
+  # 1. Serviço da sua aplicação Spring Boot
+  app-backend:
+    # Constrói a imagem usando o Dockerfile no diretório atual (.)
+    build: .
+    # Define o nome do container (opcional, mas bom para organização)
+    container_name: sistema-assistencia-backend
+    # Mapeia a porta 8080 do seu PC para a porta 8080 do container
+    ports:
+      - "8080:8080"
+    # Define variáveis de ambiente para a sua aplicação Spring
+    environment:
+      # AQUI ESTÁ A MÁGICA:
+      # Passamos a string de conexão do MongoDB para o Spring.
+      # Note que o host é 'mongo', o nome do serviço do banco abaixo.
+      - SPRING_DATA_MONGODB_URI=mongodb://mongo:27017/technical_assistance_db
+    # Garante que o serviço 'mongo' inicie antes da sua aplicação
+    depends_on:
+      - mongo
+
+  # 2. Serviço do banco de dados MongoDB
+  mongo:
+    # Puxa a imagem oficial do MongoDB
+    image: mongo:6.0
+    # Define o nome do container
+    container_name: mongo-db
+    # Mapeia a porta 27017 (padrão do Mongo) para o seu PC,
+    # caso você queira se conectar com o MongoDB Compass, por exemplo.
+    ports:
+      - "27017:27017"
+    # Cria um volume para persistir os dados do banco
+    # Mesmo se você derrubar o container, os dados estarão salvos.
+    volumes:
+      - mongo-data:/data/db
+
+# Define o volume que será usado pelo serviço 'mongo'
+volumes:
+  mongo-data:
+    driver: local
